@@ -1,80 +1,24 @@
-/* global window */
-import helper from './helper';
+/* global window, document */
 import { h } from './component/element';
-import DataProxy from './data_proxy';
+import DataProxy from './core/data_proxy';
 import Sheet from './component/sheet';
-// import Bottombar from './component/bottombar';
+import { cssPrefix } from './config';
+import { locale } from './locale/locale';
 import './index.less';
 
-const defaultOptions = {
-  view: {
-    height: () => 800,
-  },
-  formats: [],
-  fonts: [],
-  formula: [],
-  row: {
-    len: 100,
-    height: 25,
-  },
-  col: {
-    len: 26,
-    width: 100,
-    indexWidth: 60,
-    minWidth: 60,
-  },
-  style: {
-    bgcolor: '#ffffff',
-    align: 'left',
-    valign: 'middle',
-    textwrap: false,
-    textDecoration: 'normal',
-    strikethrough: false,
-    color: '#0a0a0a',
-    font: {
-      name: 'Helvetica',
-      size: 10,
-      bold: false,
-      italic: false,
-    },
-  },
-};
-
-/*
-Row: {
-  height: number
-}
-Col: {
-  width: number
-}
-Cell: {
-  text: string
-  merge: [rowLen, colLen]
-  format: string,
-  si: style-index
-}
-*/
-
-/*
-  el: element in document
-  options: like #defaultOptions
-  data: {
-    freeze: [0, 0],
-    rowm: {}, // Map<int, Row>
-    colm: {}, // Map<int, Col>
-    cellmm: {}, // Map<int, Map<int, Cell>>
-  }
-*/
 
 class Spreadsheet {
-  constructor(tel, options = {}) {
-    this.options = helper.merge(defaultOptions, options);
-    this.data = new DataProxy(this.options);
-    const rootEl = h('div', 'xss')
+  constructor(selectors, options = {}) {
+    let targetEl = selectors;
+    if (typeof selectors === 'string') {
+      targetEl = document.querySelector(selectors);
+    }
+    this.data = new DataProxy('sheet1', options);
+    const rootEl = h('div', `${cssPrefix}`)
       .on('contextmenu', evt => evt.preventDefault());
-    this.sheet = new Sheet(rootEl, this.data);
     // create canvas element
-    tel.appendChild(rootEl.el);
+    targetEl.appendChild(rootEl.el);
+    this.sheet = new Sheet(rootEl, this.data);
   }
 
   loadData(data) {
@@ -82,9 +26,17 @@ class Spreadsheet {
     return this;
   }
 
+  getData() {
+    return this.data.getData();
+  }
+
   change(cb) {
-    this.data.change(cb);
+    this.data.change = cb;
     return this;
+  }
+
+  static locale(lang, message) {
+    locale(lang, message);
   }
 }
 
@@ -93,6 +45,7 @@ const spreadsheet = (el, options = {}) => new Spreadsheet(el, options);
 if (window) {
   window.x = window.x || {};
   window.x.spreadsheet = spreadsheet;
+  window.x.spreadsheet.locale = (lang, message) => locale(lang, message);
 }
 
 export default Spreadsheet;
