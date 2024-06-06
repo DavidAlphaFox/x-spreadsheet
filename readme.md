@@ -2,6 +2,11 @@
 
 [![npm package](https://img.shields.io/npm/v/x-data-spreadsheet.svg)](https://www.npmjs.org/package/x-data-spreadsheet)
 [![NPM downloads](http://img.shields.io/npm/dm/x-data-spreadsheet.svg)](https://npmjs.org/package/x-data-spreadsheet)
+[![NPM downloads](http://img.shields.io/npm/dt/x-data-spreadsheet.svg)](https://npmjs.org/package/x-data-spreadsheet)
+[![Build passing](https://travis-ci.org/myliang/x-spreadsheet.svg?branch=master)](https://travis-ci.org/myliang/x-spreadsheet)
+[![codecov](https://codecov.io/gh/myliang/x-spreadsheet/branch/master/graph/badge.svg)](https://codecov.io/gh/myliang/x-spreadsheet)
+![GitHub](https://img.shields.io/github/license/myliang/x-spreadsheet.svg)
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/myliang/x-spreadsheet.svg)
 [![Join the chat at https://gitter.im/x-datav/spreadsheet](https://badges.gitter.im/x-datav/spreadsheet.svg)](https://gitter.im/x-datav/spreadsheet?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 > A web-based JavaScript spreadsheet
@@ -12,23 +17,25 @@
   </a>
 </p>
 
+## Document
+* en
+* [zh-cn 中文](https://hondrytravis.github.io/x-spreadsheet-doc/)
+
 ## CDN
 ```html
-<link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.0.11/dist/xspreadsheet.css">
-<script src="https://unpkg.com/x-data-spreadsheet@1.0.11/dist/xspreadsheet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.css">
+<script src="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.js"></script>
 
 <script>
-   x.spreadsheet('#xspreadsheet');
+   x_spreadsheet('#xspreadsheet');
 </script>
 ```
 
-## Install
+## NPM
 
 ```shell
 npm install x-data-spreadsheet
 ```
-
-## Quick Start
 
 ```html
 <div id="x-spreadsheet-demo"></div>
@@ -39,18 +46,23 @@ import Spreadsheet from "x-data-spreadsheet";
 // If you need to override the default options, you can set the override
 // const options = {};
 // new Spreadsheet('#x-spreadsheet-demo', options);
-new Spreadsheet("#x-spreadsheet-demo")
+const s = new Spreadsheet("#x-spreadsheet-demo")
   .loadData({}) // load data
   .change(data => {
     // save data to db
   });
+
+// data validation
+s.validate()
 ```
 
 ```javascript
 // default options
 {
+  mode: 'edit', // edit | read
   showToolbar: true,
   showGrid: true,
+  showContextmenu: true,
   view: {
     height: () => document.documentElement.clientHeight,
     width: () => document.documentElement.clientWidth,
@@ -83,8 +95,57 @@ new Spreadsheet("#x-spreadsheet-demo")
 }
 ```
 
+## import | export xlsx
+
+https://github.com/SheetJS/sheetjs/tree/master/demos/xspreadsheet#saving-data
+
+thanks https://github.com/SheetJS/sheetjs
+
+## Bind events
+```javascript
+const s = new Spreadsheet("#x-spreadsheet-demo")
+// event of click on cell
+s.on('cell-selected', (cell, ri, ci) => {});
+s.on('cells-selected', (cell, { sri, sci, eri, eci }) => {});
+// edited on cell
+s.on('cell-edited', (text, ri, ci) => {});
+```
+
+## update cell-text
+```javascript
+const s = new Spreadsheet("#x-spreadsheet-demo")
+// cellText(ri, ci, text, sheetIndex = 0)
+s.cellText(5, 5, 'xxxx').cellText(6, 5, 'yyy').reRender();
+```
+
+## get cell and cell-style
+```javascript
+const s = new Spreadsheet("#x-spreadsheet-demo")
+// cell(ri, ci, sheetIndex = 0)
+s.cell(ri, ci);
+// cellStyle(ri, ci, sheetIndex = 0)
+s.cellStyle(ri, ci);
+```
+
 ## Internationalization
-[wiki](https://github.com/myliang/x-spreadsheet/wiki/Internationalization)
+```javascript
+// npm 
+import Spreadsheet from 'x-data-spreadsheet';
+import zhCN from 'x-data-spreadsheet/dist/locale/zh-cn';
+
+Spreadsheet.locale('zh-cn', zhCN);
+new Spreadsheet(document.getElementById('xss-demo'));
+```
+```html
+<!-- Import via CDN -->
+<link rel="stylesheet" href="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.css">
+<script src="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/xspreadsheet.js"></script>
+<script src="https://unpkg.com/x-data-spreadsheet@1.1.5/dist/locale/zh-cn.js"></script>
+
+<script>
+  x_spreadsheet.locale('zh-cn');
+</script>
+```
 
 ## Features
   - Undo & Redo
@@ -110,6 +171,9 @@ new Spreadsheet("#x-spreadsheet-demo")
   - Autofill
   - Insert row, column
   - Delete row, column
+  - hide row, column
+  - multiple sheets
+  - print
   - Data validations
 
 ## Development
